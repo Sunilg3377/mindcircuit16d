@@ -1,0 +1,32 @@
+
+
+
+pipeline {
+    agent any
+
+    stages {
+        stage('clone scm') {
+            steps {
+                echo 'this stage clone from git repo'
+				
+				git branch: 'main', url: 'https://github.com/Sunilg3377/mindcircuit16d.git'
+            }
+        }
+	
+	stage('build artifact') {
+            steps {
+                echo 'this stage build the code using maven'
+				
+				sh 'mvn clean install'
+            }
+        }
+	stage('deploy to tomcat') {
+            steps {
+                echo 'this stage deploy to .war file to tomact webserver'
+				
+				deploy adapters: [tomcat9(alternativeDeploymentContext: '', credentialsId: 'tomcat', path: '', url: 'http://ec2-44-204-88-32.compute-1.amazonaws.com:8080/')], contextPath: 'fb', onFailure: false, war: '**/*.war'
+            }
+        }
+	
+}
+}
